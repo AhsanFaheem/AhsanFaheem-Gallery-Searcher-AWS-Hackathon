@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Go For Pic</string>
+    <string-array name="filters_list">
+        <item>Person</item>
+        <item>Cell phone</item>
+        <item>Cake</item>
+        <item>Tie</item>
+        <item>Car</item>
+        <item>Laptop</item>
+        <item>Car</item>
+        <item>Airplane</item>
+        <item>Apple</item>
+        <item>Laptop</item>
+        <item>Backpack</item>
+        <item>Donut</item>
+        <item>Clock</item>
+        <item>Bus</item>
+        <item>Car</item>
+        <item>Cup</item>
+        <item>Motorcycle</item>
+        <item>Pizza</item>
+
+    </string-array>
+    <string-array name="emotions_list">
+        <item>Smile</item>
+        <item>Laughing</item>
+        <item>Serious</item>
+        <item>Angry</item>
+
+    </string-array>
+    <string name="object_detector_url">https://9k6yfg3avh.execute-api.us-east-1.amazonaws.com/TEST/object-detector-resource</string>
+
+</resources>

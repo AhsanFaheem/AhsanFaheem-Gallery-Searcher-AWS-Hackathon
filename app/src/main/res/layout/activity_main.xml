@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="5dp"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/pathSelectionLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/openGallery"
+            android:layout_width="150dp"
+            android:layout_height="35dp"
+            android:textSize="9dp"
+            android:onClick="openFolderBrowser"
+            android:drawableLeft="@drawable/ic_folder"
+            android:text="Select Folder" />
+
+        <ImageView
+            android:id="@+id/folderSelectedIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="5dp"
+            android:src="@drawable/ic_not_done" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/filterSelectionLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pathSelectionLayout">
+
+        <Button
+            android:id="@+id/selectFilter"
+            android:layout_width="150dp"
+            android:layout_height="35dp"
+            android:textSize="9dp"
+            android:drawableLeft="@drawable/ic_filter"
+            android:onClick="openFiltersActivity"
+            android:text="Select Filter" />
+
+        <ImageView
+            android:id="@+id/filterSelectedIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="5dp"
+            android:src="@drawable/ic_not_done" />
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/startActionLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:weightSum="4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filterSelectionLayout">
+
+        <Button
+            android:enabled="false"
+            android:id="@+id/startButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="3.2"
+            android:tag="start"
+            android:onClick="startStopProcessing"
+            android:text="Start" />
+
+        <ProgressBar
+            android:id="@+id/processingLoadbar"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            android:layout_weight="0.8"
+            android:max="100"
+            android:src="@drawable/ic_not_done" />
+
+    </LinearLayout>
+<LinearLayout
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/startActionLayout"
+    android:orientation="vertical"
+    android:visibility="invisible"
+    android:id="@+id/outputLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/processingStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Processing Images......"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/outputLayout"
+        android:orientation="vertical"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <GridView
+            android:id="@+id/gridView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnWidth="150dp"
+            android:gravity="center"
+            android:numColumns="2"
+            android:padding="2dp"
+            android:verticalSpacing="2dp"
+            android:stretchMode="columnWidth"></GridView>
+
+
+    </LinearLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
