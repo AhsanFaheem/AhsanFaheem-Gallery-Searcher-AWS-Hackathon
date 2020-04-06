@@ -17,7 +17,7 @@
 
         <Button
             android:id="@+id/openGallery"
-            android:layout_width="150dp"
+            android:layout_width="200dp"
             android:layout_height="35dp"
             android:textSize="9dp"
             android:onClick="openFolderBrowser"
@@ -32,29 +32,78 @@
             android:src="@drawable/ic_not_done" />
     </LinearLayout>
     <LinearLayout
-        android:id="@+id/filterSelectionLayout"
+    android:id="@+id/filterSelectionLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/pathSelectionLayout">
+
+    <Button
+        android:id="@+id/selectFilter"
+        android:layout_width="200dp"
+        android:layout_height="35dp"
+        android:textSize="9dp"
+        android:drawableLeft="@drawable/ic_filter"
+        android:onClick="openFiltersActivity"
+        android:text="Select Filter" />
+
+    <ImageView
+        android:id="@+id/filterSelectedIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="5dp"
+        android:src="@drawable/ic_not_done" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/emotionFilterSelectionLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pathSelectionLayout">
+        app:layout_constraintTop_toBottomOf="@+id/filterSelectionLayout">
 
         <Button
-            android:id="@+id/selectFilter"
-            android:layout_width="150dp"
+            android:id="@+id/selectEmotionFilter"
+            android:layout_width="200dp"
             android:layout_height="35dp"
             android:textSize="9dp"
             android:drawableLeft="@drawable/ic_filter"
             android:onClick="openFiltersActivity"
-            android:text="Select Filter" />
+            android:text="Select Emotion Filter" />
 
         <ImageView
-            android:id="@+id/filterSelectedIcon"
+            android:id="@+id/EmotionFilterSelectedIcon"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginLeft="5dp"
             android:src="@drawable/ic_not_done" />
 
+</LinearLayout>
+    <LinearLayout
+        android:id="@+id/textFilterSelectionLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/emotionFilterSelectionLayout">
+
+        <Button
+            android:id="@+id/selectTextFilter"
+            android:layout_width="200dp"
+            android:layout_height="35dp"
+            android:textSize="9dp"
+            android:drawableLeft="@drawable/ic_filter"
+            android:onClick="openTextFilterScreen"
+            android:text="Select Text Filter" />
+
+        <ImageView
+            android:id="@+id/TextFilterSelectedIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="5dp"
+            android:src="@drawable/ic_not_done" />
 
     </LinearLayout>
     <LinearLayout
@@ -65,7 +114,7 @@
         android:layout_marginTop="10dp"
         android:weightSum="4"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filterSelectionLayout">
+        app:layout_constraintTop_toBottomOf="@id/textFilterSelectionLayout">
 
         <Button
             android:enabled="false"
@@ -115,7 +164,6 @@
         android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
 
         <GridView
             android:id="@+id/gridView"

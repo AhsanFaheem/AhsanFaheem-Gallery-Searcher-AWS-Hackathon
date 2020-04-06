@@ -29,5 +29,6 @@
 
     </string-array>
     <string name="object_detector_url">https://9k6yfg3avh.execute-api.us-east-1.amazonaws.com/TEST/object-detector-resource</string>
+    <string name="document_reader_url">https://5dyn9rbbfi.execute-api.us-east-1.amazonaws.com/TEST/document-reader</string>
 
 </resources>

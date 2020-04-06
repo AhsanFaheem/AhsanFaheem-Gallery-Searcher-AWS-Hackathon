@@ -3,11 +3,15 @@ package com.awshackathon.goforpic.data;
 import android.net.Uri;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GluonOpenCVObjectDetectorData {
-    private String endpointUrl;
+    private String objectDetectorEndpoint;
+    private String documentReaderEndpoint;
     private Uri selectedFolderPath ;
     private ArrayList<String> selectedFilters;
+    private ArrayList<String> selectedHumanFilters;
+    private List<String> selectedTextFilters;
 
     public Uri getSelectedFolderPath() {
         return selectedFolderPath;
@@ -25,11 +29,35 @@ public class GluonOpenCVObjectDetectorData {
         this.selectedFilters = selectedFilters;
     }
 
-    public String getEndpointUrl() {
-        return endpointUrl;
+    public String getObjectDetectorEndpoint() {
+        return objectDetectorEndpoint;
     }
 
-    public void setEndpointUrl(String endpointUrl) {
-        this.endpointUrl = endpointUrl;
+    public void setObjectDetectorEndpoint(String objectDetectorEndpoint) {
+        this.objectDetectorEndpoint = objectDetectorEndpoint;
+    }
+
+    public String getDocumentReaderEndpoint() {
+        return documentReaderEndpoint;
+    }
+
+    public void setDocumentReaderEndpoint(String documentReaderEndpoint) {
+        this.documentReaderEndpoint = documentReaderEndpoint;
+    }
+
+    public ArrayList<String> getSelectedHumanFilters() {
+        return selectedHumanFilters;
+    }
+
+    public void setSelectedHumanFilters(ArrayList<String> selectedHumanFilters) {
+        this.selectedHumanFilters = selectedHumanFilters;
+    }
+
+    public List<String> getSelectedTextFilters() {
+        return selectedTextFilters;
+    }
+
+    public void setSelectedTextFilters(List<String> selectedTextFilters) {
+        this.selectedTextFilters = selectedTextFilters;
     }
 }

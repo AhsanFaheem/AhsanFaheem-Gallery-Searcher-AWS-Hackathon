@@ -17,6 +17,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.awshackathon.goforpic.data.GluonOpenCVObjectDetectorData;
+import com.awshackathon.goforpic.domain.ImageForProcessing;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,8 +41,9 @@ public class ObjectDetectorService {
     Map<Integer, Uri> imagesForProcessing = new HashMap<Integer, Uri>();
     RequestQueue requestQueue;
     int totalImages, processedImages = 0;
-
+    ArrayList<Uri> alreadyMatchedImgs = new ArrayList<>();
     private ArrayList<String> filters = new ArrayList<>();
+    private ArrayList<String> textFilters = new ArrayList<>();
 
     ProcessedImagedReadWriteService savedImagesRWService;
 
@@ -50,8 +52,8 @@ public class ObjectDetectorService {
 
         if (gluonOpenCVObjectDetectorData.getSelectedFilters() != null)
             filters = gluonOpenCVObjectDetectorData.getSelectedFilters();
-
-
+        if (gluonOpenCVObjectDetectorData.getSelectedTextFilters() != null)
+            textFilters = new ArrayList<>(gluonOpenCVObjectDetectorData.getSelectedTextFilters());
         addUnprocessedImgsToReqQueue(gluonOpenCVObjectDetectorData);
     }
 
@@ -69,7 +71,7 @@ public class ObjectDetectorService {
             Log.i("Processing File ", file.getUri().getPath());
             try {
                 if (savedImagesRWService.ifImageExist(file.getUri())) {
-                    if (savedImagesRWService.isCriteriaMatches(file.getUri(), filters)) {
+                    if (savedImagesRWService.isCriteriaMatchesForTagsFilter(file.getUri(), filters)) {
                         matchedImagesUriQueue.add(file.getUri());
                     }
                 } else {
@@ -77,12 +79,19 @@ public class ObjectDetectorService {
                     //  bitmap=Bitmap.createScaledBitmap(bitmap,100,100,true);
                     String base64Encoded = getBase64ImageString(bitmap);
                     Log.i("base64 encoded", base64Encoded);
-                    totalImages++;
+                    totalImages+=2;
                     int imgReference = atomicInteger.getAndIncrement();
                     imagesForProcessing.put(imgReference, file.getUri());
                     final String requestPayload = prepareRequestPayload(base64Encoded, imgReference);
-                    StringRequest stringRequest = getStringRequest(gluonOpenCVObjectDetectorData.getEndpointUrl(), requestPayload);
-                    requestQueue.add(stringRequest);
+                    StringRequest stringRequest = null;
+                    if (filters != null) {
+                        stringRequest = getObjectDetectionRequest(gluonOpenCVObjectDetectorData.getObjectDetectorEndpoint(), requestPayload);
+                        requestQueue.add(stringRequest);
+                    }
+                    if (textFilters != null) {
+                        stringRequest = getDocumentReadRequest(gluonOpenCVObjectDetectorData.getDocumentReaderEndpoint(), requestPayload);
+                        requestQueue.add(stringRequest);
+                    }
                 }
 
             } catch (IOException | JSONException e) {
@@ -102,7 +111,8 @@ public class ObjectDetectorService {
         return listOfImages;
     }
 
-    private StringRequest getStringRequest(final String url, final String requestPayload) {
+    private StringRequest getObjectDetectionRequest(final String url, final String requestPayload) {
+
         return new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
@@ -126,12 +136,85 @@ public class ObjectDetectorService {
                             listOfTags.add(id);
                             for (int j = 0; j < filters.size(); j++) {
                                 if (id.equalsIgnoreCase(filters.get(j))) {
-                                    matchedImagesUriQueue.add(path);
+                                    if (!alreadyMatchedImgs.contains(path)) {
+                                        matchedImagesUriQueue.add(path);
+                                        alreadyMatchedImgs.add(path);
+                                    }
                                     break;
                                 }
                             }
                         }
-                        savedImagesRWService.saveImage(path, listOfTags);
+                        ImageForProcessing imageForProcessing = new ImageForProcessing();
+                        imageForProcessing.setImageUri(path);
+                        imageForProcessing.setListOfIds(listOfTags);
+
+                        savedImagesRWService.saveImage(path, imageForProcessing);
+                        processedImages++;
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.i("volley error", error.toString());
+                    }
+                }) {
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                try {
+                    return requestPayload.getBytes("utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                return super.getBody();
+            }
+        };
+    }
+
+    private StringRequest getDocumentReadRequest(final String url, final String requestPayload) {
+        return new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i("Response is: ", response.toString());
+                        try {
+                            processResult(response);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    private void processResult(String response) throws JSONException {
+                        JSONObject data = new JSONObject(response);
+                        String textInResponse = data.getString("result");
+                        Uri path = (imagesForProcessing.get(Integer.parseInt(data.getString("ref"))));
+
+                        for (int j = 0; j < textFilters.size(); j++) {
+                            if (textInResponse.length() >= textFilters.get(j).length()) {
+                                if (textInResponse.toLowerCase().contains(textFilters.get(j).toLowerCase())) {
+                                    if (!alreadyMatchedImgs.contains(path)) {
+                                        matchedImagesUriQueue.add(path);
+                                        alreadyMatchedImgs.add(path);
+                                    }
+                                    ImageForProcessing imageForProcessing = new ImageForProcessing();
+                                    imageForProcessing.setText(textInResponse);
+                                    savedImagesRWService.saveImage(path, imageForProcessing);
+
+                                    break;
+                                }
+                            } else {
+                                if (textFilters.get(j).toLowerCase().contains(textInResponse.toLowerCase())) {
+                                    if (!alreadyMatchedImgs.contains(path)) {
+                                        matchedImagesUriQueue.add(path);
+                                        alreadyMatchedImgs.add(path);
+                                    }
+
+                                    ImageForProcessing imageForProcessing = new ImageForProcessing();
+                                    imageForProcessing.setText(textInResponse);
+                                    savedImagesRWService.saveImage(path, imageForProcessing);
+                                    break;
+                                }
+                            }
+                        }
                         processedImages++;
                     }
                 },

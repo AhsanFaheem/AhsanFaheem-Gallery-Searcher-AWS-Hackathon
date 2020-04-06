@@ -32,6 +32,7 @@ import com.bumptech.glide.Glide;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar processingImagesProgressBar;
     final int FOLDER_SELECTED_RESULT = 1;
     final int FILTER_SELECTED_RESULT = 2;
-
+    final int TEXT_FILTER_SELECTED_RESULT = 3;
     Uri selectedFolderPath = null;
     ArrayList<String> selectedFilters = null;
 
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private Timer statusCheckTimer;
     private ArrayList<Uri> matchedImagesUrl;
     private ImageAdapter gridViewAdapter;
+    private String documentFilterSelectedText;
 
 
     @Override
@@ -91,6 +93,11 @@ public class MainActivity extends AppCompatActivity {
                 selectedFilters = data.getStringArrayListExtra("selectedFilters");
                 Log.i("selectedFilters", selectedFilters.toString());
                 filterSelectedIconImageView.setImageResource(R.drawable.ic_done);
+            }
+        }
+        else if(requestCode==TEXT_FILTER_SELECTED_RESULT){
+            if(resultCode==Activity.RESULT_OK){
+                documentFilterSelectedText=data.getStringExtra("searchText");
             }
         }
     }
@@ -143,7 +150,9 @@ public class MainActivity extends AppCompatActivity {
                 objectDetectorData = new GluonOpenCVObjectDetectorData();
             objectDetectorData.setSelectedFilters(selectedFilters);
             objectDetectorData.setSelectedFolderPath(selectedFolderPath);
-            objectDetectorData.setEndpointUrl(getResources().getString(R.string.object_detector_url));
+            objectDetectorData.setObjectDetectorEndpoint(getResources().getString(R.string.object_detector_url));
+            objectDetectorData.setDocumentReaderEndpoint(getResources().getString(R.string.document_reader_url));
+            objectDetectorData.setSelectedTextFilters(Arrays.asList(documentFilterSelectedText));
 
             if (objectDetectorService == null)
                 objectDetectorService = new ObjectDetectorService(this);
@@ -157,13 +166,9 @@ public class MainActivity extends AppCompatActivity {
                     postProcessing();
                 }
             }, 0, 4000);
-
-
         } else {
             doFrontEndChangesIdle();
         }
-
-
     }
 
     private void doFrontEndChangesIdle() {
@@ -174,6 +179,11 @@ public class MainActivity extends AppCompatActivity {
     private void processingCompletedFrontendChanges(){
         doFrontEndChangesIdle();
         processingStatusTextView.setText("Processing Completed");
+    }
+
+    public void openTextFilterScreen(View view) {
+        Intent intent = new Intent(MainActivity.this, TextFilterScreen.class);
+        startActivityForResult(intent, TEXT_FILTER_SELECTED_RESULT);
     }
 
     public class ImageAdapter extends BaseAdapter {
