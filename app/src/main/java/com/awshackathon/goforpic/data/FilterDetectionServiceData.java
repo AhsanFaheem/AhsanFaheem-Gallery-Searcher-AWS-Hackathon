@@ -4,9 +4,6 @@ import android.net.Uri;
 
 import com.awshackathon.goforpic.domain.Filters;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class FilterDetectionServiceData {
     private String objectDetectorEndpoint;
     private String emotionDetectorEndpoint;

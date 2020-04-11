@@ -3,14 +3,19 @@ package com.awshackathon.goforpic;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ScrollView;
 
 import com.awshackathon.goforpic.domain.Filters;
 
@@ -25,10 +30,13 @@ public class AllFilters extends AppCompatActivity {
     
     private ArrayList<String> selectedObjectFilters;
     private ArrayList<String> selectedEmotionsFilters;
-    private String textFilter;
     private ArrayAdapter<String> objectsFiltersAdapter;
     private ArrayAdapter<String> emotionsFiltersAdapter;
+LinearLayout textFiltersEditTextsLayout;
+    ScrollView textFiltersScrollView;
 
+    private ArrayList<EditText> toSearchTextEditTextsLists;
+    int editTextsCount=1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -44,17 +52,31 @@ public class AllFilters extends AppCompatActivity {
         emotionsFiltersAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice, Arrays.asList(getResources().getStringArray(R.array.emotions_filter_list)));
         emotionsListView.setAdapter(emotionsFiltersAdapter);
         toSearchInImages=findViewById(R.id.textToSearch);
+
+        textFiltersEditTextsLayout=findViewById(R.id.testToSearchEditTextsLayout);
+        textFiltersScrollView=findViewById(R.id.textToSearchScrollView);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
+        toSearchTextEditTextsLists=new ArrayList<>();
+        toSearchTextEditTextsLists.add(toSearchInImages);
     }
 
     public void filtersSelectionCompleted(View view) {
         selectedObjectFilters=getNamesOfFilters(objectsListView.getCheckedItemPositions(),objectsFiltersAdapter);
         selectedEmotionsFilters=getNamesOfFilters(emotionsListView.getCheckedItemPositions(),emotionsFiltersAdapter);
-        textFilter=toSearchInImages.getText().toString();
+        
 
         Filters filters=new Filters();
         filters.setObjectsFiltersList(selectedObjectFilters);
         filters.setEmotionsFiltersList(selectedEmotionsFilters);
-        filters.setTextFilter(textFilter);
+
+        ArrayList<String> textFilters = new ArrayList<>();
+        for(int i=0;i<toSearchTextEditTextsLists.size();i++){
+            if(!toSearchTextEditTextsLists.get(i).getText().toString().isEmpty())
+               textFilters.add(toSearchTextEditTextsLists.get(i).getText().toString());
+        }
+
+        filters.setTextFilterList(textFilters);
 
         Intent intent=new Intent(AllFilters.this,MainActivity.class);
         intent.putExtra("selectedFilters", filters);
@@ -69,5 +91,25 @@ public class AllFilters extends AppCompatActivity {
             }
         }
         return selectedFilters;
+    }
+
+    public void addMoreTextFilter(View view) {
+
+
+        ScrollView.LayoutParams layoutParams=new ScrollView.LayoutParams(300,LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(100,0,0,0);
+        EditText editText=new EditText(this);
+        editText.setHint("Enter Text To Search");
+        editText.setTextSize(12);
+        editText.setLayoutParams(layoutParams);
+        toSearchTextEditTextsLists.add(editText);
+
+        textFiltersEditTextsLayout.addView(editText);
+        textFiltersScrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                textFiltersScrollView.fullScroll(View.FOCUS_DOWN);
+            }
+        });
     }
 }

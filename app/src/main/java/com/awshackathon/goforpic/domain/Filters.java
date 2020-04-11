@@ -4,20 +4,24 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Filters implements Serializable {
-    private String textFilter;
+    private ArrayList<String> textFilterList;
     private ArrayList<String> objectsFiltersList;
     private ArrayList<String> emotionsFiltersList;
 
-    public String getTextFilter() {
-        return textFilter;
+    public ArrayList<String> getTextFilter() {
+        if (textFilterList != null && !textFilterList.isEmpty())
+            return textFilterList;
+        return null;
     }
 
-    public void setTextFilter(String textFilter) {
-        this.textFilter = textFilter;
+    public void setTextFilterList(ArrayList<String> textFilterList) {
+        this.textFilterList = textFilterList;
     }
 
     public ArrayList<String> getObjectsFiltersList() {
-        return objectsFiltersList;
+        if (objectsFiltersList != null && !objectsFiltersList.isEmpty())
+            return objectsFiltersList;
+        return null;
     }
 
     public void setObjectsFiltersList(ArrayList<String> objectsFiltersList) {
@@ -25,7 +29,9 @@ public class Filters implements Serializable {
     }
 
     public ArrayList<String> getEmotionsFiltersList() {
-        return emotionsFiltersList;
+        if (emotionsFiltersList != null && !emotionsFiltersList.isEmpty())
+            return emotionsFiltersList;
+        return null;
     }
 
     public void setEmotionsFiltersList(ArrayList<String> emotionsFiltersList) {

@@ -28,19 +28,23 @@ public class ProcessedImagedReadWriteService {
 
     public void load() {
         String jsonValue = sharedPreferences.getString("processedImages", "");
-        Type type = new TypeToken<Map<String, ImageForProcessing>>() {}.getType();
+        Type type = new TypeToken<Map<String, ImageForProcessing>>() {
+        }.getType();
         Map<String, ImageForProcessing> imageForProcessing = gson.fromJson(jsonValue, type);
         if (imageForProcessing != null)
             processedImages.putAll(imageForProcessing);
     }
+
     public boolean ifImageExistWithObjectFilter(String uri) {
         ImageForProcessing val = processedImages.get(uri);
         return val != null && val.getListOfIds() != null;
     }
+
     public boolean ifImageExistWithTextFilter(String uri) {
         ImageForProcessing val = processedImages.get(uri);
         return val != null && val.getText() != null;
     }
+
     public boolean ifImageExistWithEmotionFilter(String uri) {
         ImageForProcessing val = processedImages.get(uri);
         return val != null && val.getHumanEmotions() != null;

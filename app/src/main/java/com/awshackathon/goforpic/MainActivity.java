@@ -166,7 +166,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void processingCompletedFrontendChanges() {
         doFrontEndChangesIdle();
-        processingStatusTextView.setText("Processing Completed");
+        if(matchedImagesUrl.isEmpty())
+         processingStatusTextView.setText("Processing Completed");
+        else
+            processingStatusTextView.setText("Processing Completed (Click on the image to open it)");
     }
 
     public class ImageAdapter extends BaseAdapter {
@@ -190,13 +193,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
 
             ImageView imageView;
             if (convertView == null) {
                 imageView = new ImageView(context);
                 imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 imageView.setLayoutParams(new GridView.LayoutParams(270, 270));
+                imageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                       Intent intent=new Intent();
+                       intent.setAction(Intent.ACTION_VIEW);
+                       intent.setDataAndType(imagesUri.get(position),"image/*");
+                       intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                       startActivity(intent);
+                    }
+                });
 
             } else {
                 imageView = (ImageView) convertView;

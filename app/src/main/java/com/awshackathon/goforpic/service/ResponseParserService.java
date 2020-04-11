@@ -1,8 +1,11 @@
 package com.awshackathon.goforpic.service;
 
+import android.content.Context;
 import android.net.Uri;
+import android.widget.Toast;
 
 import com.awshackathon.goforpic.domain.ImageForProcessing;
+import com.awshackathon.goforpic.exception.ResponseException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,9 +16,11 @@ import java.util.Map;
 
 public class ResponseParserService {
     ProcessedImagedReadWriteService savedImagesRWService;
-
-    public Uri parseObjectDetectorResponse(String response, Map<Integer, Uri> imagesForProcessing, ArrayList<String> objectFilters) throws JSONException {
+    Context context;
+    public Uri parseObjectDetectorResponse(String response, Map<Integer, Uri> imagesForProcessing, ArrayList<String> objectFilters) throws JSONException, ResponseException {
         JSONObject data = new JSONObject(response);
+        validateResponse(data,"Object Detection");
+
         JSONArray idsJsonArray = data.getJSONArray("result");
         ArrayList listOfTags = new ArrayList();
         Uri path = (imagesForProcessing.get(Integer.parseInt(data.getString("ref"))));
@@ -39,8 +44,9 @@ public class ResponseParserService {
         return null;
     }
 
-    public Uri parseEmotionDetectorResponse(String response, Map<Integer, Uri> imagesForProcessing, ArrayList<String> emotionFilters) throws JSONException {
+    public Uri parseEmotionDetectorResponse(String response, Map<Integer, Uri> imagesForProcessing, ArrayList<String> emotionFilters) throws JSONException, ResponseException {
         JSONObject data = new JSONObject(response);
+        validateResponse(data,"Emotion Detection");
         JSONArray idsJsonArray = data.getJSONArray("result");
         ArrayList listOfEmotions = new ArrayList();
         boolean matched = false;
@@ -65,8 +71,10 @@ public class ResponseParserService {
 
     }
 
-    public Uri parseTextReaderResponse(String response, Map<Integer, Uri> imagesForProcessing, ArrayList<String> textFilters) throws JSONException {
+    public Uri parseTextReaderResponse(String response, Map<Integer, Uri> imagesForProcessing, ArrayList<String> textFilters) throws JSONException, ResponseException {
         JSONObject data = new JSONObject(response);
+        validateResponse(data,"Text Detection");
+
         String textInResponse = data.getString("result");
         Uri path = (imagesForProcessing.get(Integer.parseInt(data.getString("ref"))));
         boolean matched = false;
@@ -90,8 +98,16 @@ public class ResponseParserService {
         if (matched) return path;
         return null;
     }
+    public void validateResponse(JSONObject data, String filterType) throws JSONException, ResponseException {
+        if(!data.isNull("errorMessage")){
+            Toast.makeText(context.getApplicationContext(), "Error while performing "+filterType, Toast.LENGTH_SHORT).show();
+            throw new ResponseException("Error While Processing Image for "+filterType+" : "+data.getString("errorMessage"));
+        }
 
-    public ResponseParserService(ProcessedImagedReadWriteService savedImagesRWService) {
+
+    }
+    public ResponseParserService(ProcessedImagedReadWriteService savedImagesRWService, Context context) {
         this.savedImagesRWService = savedImagesRWService;
+        this.context=context;
     }
 }

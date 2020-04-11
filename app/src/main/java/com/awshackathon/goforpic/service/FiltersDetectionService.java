@@ -56,8 +56,8 @@ public class FiltersDetectionService {
         resetFields();
         if (filterDetectionServiceData.getSelectedFilters().getObjectsFiltersList() != null)
             objectFilters = filterDetectionServiceData.getSelectedFilters().getObjectsFiltersList();
-        if (filterDetectionServiceData.getSelectedFilters().getTextFilter() != null)
-            textFilters = new ArrayList<>(Arrays.asList(filterDetectionServiceData.getSelectedFilters().getTextFilter()));
+        if (filterDetectionServiceData.getSelectedFilters().getTextFilter() != null )
+            textFilters = filterDetectionServiceData.getSelectedFilters().getTextFilter();
         if (filterDetectionServiceData.getSelectedFilters().getEmotionsFiltersList() != null)
             emotionFilters = filterDetectionServiceData.getSelectedFilters().getEmotionsFiltersList();
         addUnprocessedImgsToReqQueue(filterDetectionServiceData);
@@ -71,7 +71,7 @@ public class FiltersDetectionService {
     }
 
     private void addUnprocessedImgsToReqQueue(FilterDetectionServiceData filterDetectionServiceData) {
-        savedImagesRWService.resetPreferences();
+      //  savedImagesRWService.resetPreferences();
         DocumentFile documentFile = DocumentFile.fromTreeUri(context, filterDetectionServiceData.getSelectedFolderPath());
         savedImagesRWService.load();
         for (DocumentFile file : documentFile.listFiles()) {
@@ -102,7 +102,7 @@ public class FiltersDetectionService {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), file.getUri());
                 //  bitmap=Bitmap.createScaledBitmap(bitmap,100,100,true);
                 String base64Encoded = getBase64ImageString(bitmap);
-                Log.i("base64 encoded", base64Encoded);
+                Log.i("base64","Prepared base64 image for "+file.getUri().getPath());
                 int imgReference = atomicInteger.getAndIncrement();
                 imagesForProcessing.put(imgReference, file.getUri());
                 final String requestPayload = prepareRequestPayload(base64Encoded, imgReference);
@@ -267,6 +267,7 @@ public class FiltersDetectionService {
     }
 
     private String getBase64ImageString(Bitmap bitmap) {
+        Log.i("base64","Going to prepare base 64");
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 20, stream);
         byte[] byteArray = stream.toByteArray();
@@ -277,7 +278,7 @@ public class FiltersDetectionService {
         this.context = context;
         requestQueue = Volley.newRequestQueue(this.context);
         savedImagesRWService = new ProcessedImagedReadWriteService(context);
-        responseParserService = new ResponseParserService(savedImagesRWService);
+        responseParserService = new ResponseParserService(savedImagesRWService,this.context);
     }
 
 }
