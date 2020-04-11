@@ -46,5 +46,4 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.3.1'
 
     testImplementation 'junit:junit:4.11'
-    implementation files('libs/aws-android-sdk-textract.jar')
 }

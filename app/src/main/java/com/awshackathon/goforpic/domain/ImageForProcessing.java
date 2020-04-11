@@ -2,19 +2,20 @@ package com.awshackathon.goforpic.domain;
 
 import android.net.Uri;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class ImageForProcessing {
-    private Uri imageUri;
+    private String imageUri;
     private ArrayList<String> listOfIds;
     private ArrayList<String> humanEmotions;
     private String text;
 
-    public Uri getImageUri() {
+    public String getImageUri() {
         return imageUri;
     }
 
-    public void setImageUri(Uri imageUri) {
+    public void setImageUri(String imageUri) {
         this.imageUri = imageUri;
     }
 

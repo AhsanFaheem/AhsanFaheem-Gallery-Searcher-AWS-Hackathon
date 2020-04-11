@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AllFilters">
+
+
+
+    <TextView
+        android:id="@+id/objectText"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="15dp"
+        android:layout_margin="10dp"
+        android:text="Object"
+        android:typeface="monospace"/>
+    <ListView
+        app:layout_constraintTop_toBottomOf="@id/objectText"
+        android:id="@+id/objectsListView"
+        android:scrollbarSize="200dip"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="20dp"
+        android:scrollbarStyle="outsideOverlay"
+        android:layout_marginRight="20dp"
+        android:scrollbarAlwaysDrawHorizontalTrack="true"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:layout_width="match_parent"
+        android:fadeScrollbars="false"
+        android:layout_height="150dp"/>
+    <TextView
+        android:id="@+id/emotionText"
+        app:layout_constraintTop_toBottomOf="@id/objectsListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Emotion"
+        android:textStyle="bold"
+        android:textSize="15dp"
+        android:layout_margin="10dp"
+        android:typeface="monospace"/>
+    <ListView
+        app:layout_constraintTop_toBottomOf="@id/emotionText"
+        android:layout_width="match_parent"
+        android:paddingLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:dividerHeight="1dp"
+        android:id="@+id/emotionsListView"
+android:scrollbarSize="20dp"
+        android:layout_height="150dp"/>
+    <TextView
+        android:id="@+id/text"
+        app:layout_constraintTop_toBottomOf="@id/emotionsListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Text"
+        android:layout_margin="10dp"
+        android:textStyle="bold"
+        android:textSize="15dp"
+        android:typeface="monospace"/>
+<EditText
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_constraintTop_toBottomOf="@id/text"
+    android:textSize="12dp"
+    android:id="@+id/textToSearch"
+    android:hint="Enter Text To Search"
+    android:layout_marginLeft="50dp"
+    android:layout_marginRight="50dp"/>
+
+    <Button
+        android:id="@+id/finalizeFiltersSelection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="filtersSelectionCompleted"
+        android:text="Done"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

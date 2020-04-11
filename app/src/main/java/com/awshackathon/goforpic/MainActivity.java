@@ -6,13 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -21,18 +17,14 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.awshackathon.goforpic.data.GluonOpenCVObjectDetectorData;
-import com.awshackathon.goforpic.service.ObjectDetectorService;
+import com.awshackathon.goforpic.data.FilterDetectionServiceData;
+import com.awshackathon.goforpic.domain.Filters;
+import com.awshackathon.goforpic.service.FiltersDetectionService;
 import com.bumptech.glide.Glide;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -51,10 +43,10 @@ public class MainActivity extends AppCompatActivity {
     final int FILTER_SELECTED_RESULT = 2;
     final int TEXT_FILTER_SELECTED_RESULT = 3;
     Uri selectedFolderPath = null;
-    ArrayList<String> selectedFilters = null;
+    Filters selectedFilters = null;
 
-    GluonOpenCVObjectDetectorData objectDetectorData;
-    ObjectDetectorService objectDetectorService;
+    FilterDetectionServiceData objectDetectorData;
+    FiltersDetectionService objectDetectorService;
     private Timer statusCheckTimer;
     private ArrayList<Uri> matchedImagesUrl;
     private ImageAdapter gridViewAdapter;
@@ -66,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         folderSelectedIconImageView = findViewById(R.id.folderSelectedIcon);
-        filterSelectedIconImageView=findViewById(R.id.filterSelectedIcon);
+        filterSelectedIconImageView = findViewById(R.id.filterSelectedIcon);
         startButton = findViewById(R.id.startButton);
         outputLinearLayout = findViewById(R.id.outputLayout);
         processingStatusTextView = findViewById(R.id.processingStatus);
@@ -90,14 +82,9 @@ public class MainActivity extends AppCompatActivity {
 
         } else if (requestCode == FILTER_SELECTED_RESULT) {
             if (resultCode == Activity.RESULT_OK) {
-                selectedFilters = data.getStringArrayListExtra("selectedFilters");
+                selectedFilters = (Filters) data.getSerializableExtra("selectedFilters");
                 Log.i("selectedFilters", selectedFilters.toString());
                 filterSelectedIconImageView.setImageResource(R.drawable.ic_done);
-            }
-        }
-        else if(requestCode==TEXT_FILTER_SELECTED_RESULT){
-            if(resultCode==Activity.RESULT_OK){
-                documentFilterSelectedText=data.getStringExtra("searchText");
             }
         }
     }
@@ -109,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openFiltersActivity(View view) {
-        Intent intent = new Intent(MainActivity.this, FiltersScreen.class);
+        Intent intent = new Intent(MainActivity.this, AllFilters.class);
         startActivityForResult(intent, FILTER_SELECTED_RESULT);
     }
 
@@ -147,15 +134,15 @@ public class MainActivity extends AppCompatActivity {
             outputLinearLayout.setVisibility(View.VISIBLE);
 
             if (objectDetectorData == null)
-                objectDetectorData = new GluonOpenCVObjectDetectorData();
+                objectDetectorData = new FilterDetectionServiceData();
+
             objectDetectorData.setSelectedFilters(selectedFilters);
             objectDetectorData.setSelectedFolderPath(selectedFolderPath);
             objectDetectorData.setObjectDetectorEndpoint(getResources().getString(R.string.object_detector_url));
+            objectDetectorData.setEmotionDetectorEndpoint(getResources().getString(R.string.emotion_detector_url));
             objectDetectorData.setDocumentReaderEndpoint(getResources().getString(R.string.document_reader_url));
-            objectDetectorData.setSelectedTextFilters(Arrays.asList(documentFilterSelectedText));
-
             if (objectDetectorService == null)
-                objectDetectorService = new ObjectDetectorService(this);
+                objectDetectorService = new FiltersDetectionService(this);
 
             objectDetectorService.startProcessing(objectDetectorData);
             statusCheckTimer = new Timer();
@@ -176,14 +163,10 @@ public class MainActivity extends AppCompatActivity {
         startButton.setTag("start");
         processingImagesProgressBar.setVisibility(View.INVISIBLE);
     }
-    private void processingCompletedFrontendChanges(){
+
+    private void processingCompletedFrontendChanges() {
         doFrontEndChangesIdle();
         processingStatusTextView.setText("Processing Completed");
-    }
-
-    public void openTextFilterScreen(View view) {
-        Intent intent = new Intent(MainActivity.this, TextFilterScreen.class);
-        startActivityForResult(intent, TEXT_FILTER_SELECTED_RESULT);
     }
 
     public class ImageAdapter extends BaseAdapter {
