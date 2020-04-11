@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Go For Pic</string>
+    <string name="app_name">Gallery Searcher</string>
     <string-array name="objects_filter_list">
         <item>Person</item>
         <item>Cell phone</item>

@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FiltersDetectionService {
     Context context;
     ProcessedImagedReadWriteService savedImagesRWService;
+    ResponseParserService responseParserService;
     AtomicInteger atomicInteger = new AtomicInteger();
     Map<Integer, Uri> imagesForProcessing = new HashMap<Integer, Uri>();
 
@@ -70,7 +71,7 @@ public class FiltersDetectionService {
     }
 
     private void addUnprocessedImgsToReqQueue(FilterDetectionServiceData filterDetectionServiceData) {
-         // savedImagesRWService.resetPreferences();
+        savedImagesRWService.resetPreferences();
         DocumentFile documentFile = DocumentFile.fromTreeUri(context, filterDetectionServiceData.getSelectedFolderPath());
         savedImagesRWService.load();
         for (DocumentFile file : documentFile.listFiles()) {
@@ -148,38 +149,19 @@ public class FiltersDetectionService {
                     public void onResponse(String response) {
                         Log.i("Response is: ", response.toString());
                         try {
-                            processResult(response);
+                            Uri matchedResultPath = responseParserService.parseObjectDetectorResponse(response, imagesForProcessing, objectFilters);
+                            {
+                                if (matchedResultPath != null && !alreadyMatchedImgs.contains(matchedResultPath)) {
+                                    matchedImagesUriQueue.add(matchedResultPath);
+                                    alreadyMatchedImgs.add(matchedResultPath);
+                                }
+                                processedImages++;
+
+                            }
                         } catch (Exception e) {
                             processedImages++;
                             e.printStackTrace();
                         }
-                    }
-
-                    private void processResult(String response) throws JSONException {
-                        JSONObject data = new JSONObject(response);
-                        JSONArray idsJsonArray = data.getJSONArray("result");
-                        ArrayList listOfTags = new ArrayList();
-
-                        Uri path = (imagesForProcessing.get(Integer.parseInt(data.getString("ref"))));
-                        for (int i = 0; i < idsJsonArray.length(); i++) {
-                            String id = idsJsonArray.getJSONObject(i).getString("id");
-                            listOfTags.add(id);
-                            for (int j = 0; j < objectFilters.size(); j++) {
-                                if (id.equalsIgnoreCase(objectFilters.get(j))) {
-                                    if (!alreadyMatchedImgs.contains(path)) {
-                                        matchedImagesUriQueue.add(path);
-                                        alreadyMatchedImgs.add(path);
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                        ImageForProcessing imageForProcessing = new ImageForProcessing();
-                        imageForProcessing.setImageUri(path.getPath());
-                        imageForProcessing.setListOfIds(listOfTags);
-
-                        savedImagesRWService.saveImage(path.getPath(), imageForProcessing);
-                        processedImages++;
                     }
                 },
                 new Response.ErrorListener() {
@@ -208,37 +190,18 @@ public class FiltersDetectionService {
                     public void onResponse(String response) {
                         Log.i("Response is: ", response.toString());
                         try {
-                            processResult(response);
+                            Uri matchedResultPath = responseParserService.parseEmotionDetectorResponse(response, imagesForProcessing, emotionFilters);
+                            {
+                                if (matchedResultPath != null && !alreadyMatchedImgs.contains(matchedResultPath)) {
+                                    matchedImagesUriQueue.add(matchedResultPath);
+                                    alreadyMatchedImgs.add(matchedResultPath);
+                                }
+                                processedImages++;
+                            }
                         } catch (Exception e) {
                             processedImages++;
                             e.printStackTrace();
                         }
-                    }
-
-                    private void processResult(String response) throws JSONException {
-                        JSONObject data = new JSONObject(response);
-                        JSONArray idsJsonArray = data.getJSONArray("result");
-                        ArrayList listOfEmotions = new ArrayList();
-
-                        Uri path = (imagesForProcessing.get(Integer.parseInt(data.getString("ref"))));
-                        for (int i = 0; i < idsJsonArray.length(); i++) {
-                            String id = idsJsonArray.getJSONObject(i).getString("emotion");
-                            listOfEmotions.add(id);
-                            for (int j = 0; j < emotionFilters.size(); j++) {
-                                if (id.equalsIgnoreCase(emotionFilters.get(j))) {
-                                    if (!alreadyMatchedImgs.contains(path)) {
-                                        matchedImagesUriQueue.add(path);
-                                        alreadyMatchedImgs.add(path);
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                        ImageForProcessing imageForProcessing = new ImageForProcessing();
-                        imageForProcessing.setImageUri(path.getPath());
-                        imageForProcessing.setHumanEmotions(listOfEmotions);
-                        savedImagesRWService.saveImage(path.getPath(), imageForProcessing);
-                        processedImages++;
                     }
                 },
                 new Response.ErrorListener() {
@@ -266,44 +229,16 @@ public class FiltersDetectionService {
                     public void onResponse(String response) {
                         Log.i("Response is: ", response.toString());
                         try {
-                            processResult(response);
+                            Uri matchedResultPath = responseParserService.parseTextReaderResponse(response, imagesForProcessing, emotionFilters);
+                            if (matchedResultPath != null && !alreadyMatchedImgs.contains(matchedResultPath)) {
+                                matchedImagesUriQueue.add(matchedResultPath);
+                                alreadyMatchedImgs.add(matchedResultPath);
+                            }
+                            processedImages++;
                         } catch (Exception e) {
                             processedImages++;
                             e.printStackTrace();
                         }
-                    }
-
-                    private void processResult(String response) throws JSONException {
-                        JSONObject data = new JSONObject(response);
-                        String textInResponse = data.getString("result");
-                        Uri path = (imagesForProcessing.get(Integer.parseInt(data.getString("ref"))));
-
-                        for (int j = 0; j < textFilters.size(); j++) {
-                            if (textInResponse.length() >= textFilters.get(j).length()) {
-                                if (textInResponse.toLowerCase().contains(textFilters.get(j).toLowerCase())) {
-                                    if (!alreadyMatchedImgs.contains(path)) {
-                                        matchedImagesUriQueue.add(path);
-                                        alreadyMatchedImgs.add(path);
-                                    }
-                                    break;
-                                }
-                            } else {
-                                if (textFilters.get(j).toLowerCase().contains(textInResponse.toLowerCase())) {
-                                    if (!alreadyMatchedImgs.contains(path)) {
-                                        matchedImagesUriQueue.add(path);
-                                        alreadyMatchedImgs.add(path);
-                                    }
-
-                                    break;
-                                }
-                            }
-
-                        }
-
-                        ImageForProcessing imageForProcessing = new ImageForProcessing();
-                        imageForProcessing.setText(textInResponse);
-                        savedImagesRWService.saveImage(path.getPath(), imageForProcessing);
-                        processedImages++;
                     }
                 },
                 new Response.ErrorListener() {
@@ -342,6 +277,7 @@ public class FiltersDetectionService {
         this.context = context;
         requestQueue = Volley.newRequestQueue(this.context);
         savedImagesRWService = new ProcessedImagedReadWriteService(context);
+        responseParserService = new ResponseParserService(savedImagesRWService);
     }
 
 }
