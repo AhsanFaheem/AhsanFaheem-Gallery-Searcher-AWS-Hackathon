@@ -229,7 +229,7 @@ public class FiltersDetectionService {
                     public void onResponse(String response) {
                         Log.i("Response is: ", response.toString());
                         try {
-                            Uri matchedResultPath = responseParserService.parseTextReaderResponse(response, imagesForProcessing, emotionFilters);
+                            Uri matchedResultPath = responseParserService.parseTextReaderResponse(response, imagesForProcessing, textFilters);
                             if (matchedResultPath != null && !alreadyMatchedImgs.contains(matchedResultPath)) {
                                 matchedImagesUriQueue.add(matchedResultPath);
                                 alreadyMatchedImgs.add(matchedResultPath);

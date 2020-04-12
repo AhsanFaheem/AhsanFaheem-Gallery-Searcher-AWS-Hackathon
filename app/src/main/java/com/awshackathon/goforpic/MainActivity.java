@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startStopProcessing(View view) {
+        matchedImagesUrl.clear();
         if (startButton.getTag().equals("start")) {
             startButton.setText("Stop");
             startButton.setTag("stop");
