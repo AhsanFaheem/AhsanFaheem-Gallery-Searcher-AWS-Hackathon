@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("selectedFolder", data.getDataString());
                 selectedFolderPath = data.getData();
                 folderSelectedIconImageView.setImageResource(R.drawable.ic_done);
-                startButton.setEnabled(true);
             }
 
         } else if (requestCode == FILTER_SELECTED_RESULT) {
@@ -86,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("selectedFilters", selectedFilters.toString());
                 filterSelectedIconImageView.setImageResource(R.drawable.ic_done);
             }
+        }
+        if(selectedFolderPath!=null && selectedFilters!=null){
+            startButton.setEnabled(true);
         }
     }
 
@@ -162,7 +164,11 @@ public class MainActivity extends AppCompatActivity {
     private void doFrontEndChangesIdle() {
         startButton.setText("Start");
         startButton.setTag("start");
+        folderSelectedIconImageView.setImageResource(R.drawable.ic_not_done);
+        filterSelectedIconImageView.setImageResource(R.drawable.ic_not_done);
         processingImagesProgressBar.setVisibility(View.INVISIBLE);
+        startButton.setEnabled(false);
+
     }
 
     private void processingCompletedFrontendChanges() {
