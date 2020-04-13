@@ -78,9 +78,13 @@ LinearLayout textFiltersEditTextsLayout;
 
         filters.setTextFilterList(textFilters);
 
+
         Intent intent=new Intent(AllFilters.this,MainActivity.class);
         intent.putExtra("selectedFilters", filters);
-        setResult(Activity.RESULT_OK, intent);
+        if(selectedObjectFilters.isEmpty() && selectedEmotionsFilters.isEmpty() && textFilters.isEmpty())
+            setResult(Activity.RESULT_CANCELED,intent);
+        else
+            setResult(Activity.RESULT_OK, intent);
         finish();
     }
     public ArrayList<String> getNamesOfFilters(SparseBooleanArray selectedFilterItems,ArrayAdapter<String> adapter) {

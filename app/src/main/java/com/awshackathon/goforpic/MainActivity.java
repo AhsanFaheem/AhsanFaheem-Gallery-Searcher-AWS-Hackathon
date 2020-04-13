@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openFiltersActivity(View view) {
+
         Intent intent = new Intent(MainActivity.this, AllFilters.class);
         startActivityForResult(intent, FILTER_SELECTED_RESULT);
     }
@@ -129,8 +130,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startStopProcessing(View view) {
-        matchedImagesUrl.clear();
+
         if (startButton.getTag().equals("start")) {
+            matchedImagesUrl.clear();
+            outputImagesGridView.setAdapter(null);
+
             startButton.setText("Stop");
             startButton.setTag("stop");
             processingImagesProgressBar.setVisibility(View.VISIBLE);
@@ -168,7 +172,8 @@ public class MainActivity extends AppCompatActivity {
         filterSelectedIconImageView.setImageResource(R.drawable.ic_not_done);
         processingImagesProgressBar.setVisibility(View.INVISIBLE);
         startButton.setEnabled(false);
-
+        selectedFolderPath=null;
+        selectedFilters=null;
     }
 
     private void processingCompletedFrontendChanges() {

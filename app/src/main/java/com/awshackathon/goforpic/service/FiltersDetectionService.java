@@ -68,6 +68,12 @@ public class FiltersDetectionService {
         processedImages = 0;
         imagesForProcessing = new HashMap<Integer, Uri>();
         matchedImagesUriQueue = new PriorityQueue<>();
+        objectFilters=null;
+        emotionFilters=null;
+        textFilters=null;
+        matchedImagesUriQueue.clear();
+        alreadyMatchedImgs.clear();
+        imagesForProcessing.clear();
     }
 
     private void addUnprocessedImgsToReqQueue(FilterDetectionServiceData filterDetectionServiceData) {
