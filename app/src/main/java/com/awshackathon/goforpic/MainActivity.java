@@ -4,8 +4,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -66,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         outputImagesGridView = findViewById(R.id.gridView);
         matchedImagesUrl = new ArrayList<>();
         outputImagesGridView.setAdapter(gridViewAdapter);
+        validateIfActiveNetworkConnectionAvailable();
     }
 
     @Override
@@ -86,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 filterSelectedIconImageView.setImageResource(R.drawable.ic_done);
             }
         }
-        if(selectedFolderPath!=null && selectedFilters!=null){
+        if (selectedFolderPath != null && selectedFilters != null) {
             startButton.setEnabled(true);
         }
     }
@@ -165,6 +170,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void validateIfActiveNetworkConnectionAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo == null || !networkInfo.isConnected()) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    new AlertDialog.Builder(MainActivity.this).setTitle("No Active Connection Available").setMessage("Please connect to a working internet connection").setCancelable(false).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            validateIfActiveNetworkConnectionAvailable();
+                        }
+                    }).show();
+                }
+            });
+        }
+    }
+
     private void doFrontEndChangesIdle() {
         startButton.setText("Start");
         startButton.setTag("start");
@@ -172,14 +195,14 @@ public class MainActivity extends AppCompatActivity {
         filterSelectedIconImageView.setImageResource(R.drawable.ic_not_done);
         processingImagesProgressBar.setVisibility(View.INVISIBLE);
         startButton.setEnabled(false);
-        selectedFolderPath=null;
-        selectedFilters=null;
+        selectedFolderPath = null;
+        selectedFilters = null;
     }
 
     private void processingCompletedFrontendChanges() {
         doFrontEndChangesIdle();
-        if(matchedImagesUrl.isEmpty())
-         processingStatusTextView.setText("Processing Completed");
+        if (matchedImagesUrl.isEmpty())
+            processingStatusTextView.setText("Processing Completed");
         else
             processingStatusTextView.setText("Processing Completed (Click on the image to open it)");
     }
@@ -215,11 +238,11 @@ public class MainActivity extends AppCompatActivity {
                 imageView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                       Intent intent=new Intent();
-                       intent.setAction(Intent.ACTION_VIEW);
-                       intent.setDataAndType(imagesUri.get(position),"image/*");
-                       intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                       startActivity(intent);
+                        Intent intent = new Intent();
+                        intent.setAction(Intent.ACTION_VIEW);
+                        intent.setDataAndType(imagesUri.get(position), "image/*");
+                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                        startActivity(intent);
                     }
                 });
 

@@ -79,6 +79,8 @@ public class ResponseParserService {
         Uri path = (imagesForProcessing.get(Integer.parseInt(data.getString("ref"))));
         boolean matched = false;
 
+        if(textInResponse.isEmpty())
+            return null;
         for (int j = 0; j < textFilters.size(); j++) {
             if (textInResponse.length() >= textFilters.get(j).length()) {
                 if (textInResponse.toLowerCase().contains(textFilters.get(j).toLowerCase())) {

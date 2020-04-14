@@ -108,6 +108,7 @@ public class ProcessedImagedReadWriteService {
     public boolean isCriteriaMatchesForTextFilter(String path, ArrayList<String> textFilters) {
         ImageForProcessing imageForProcessing = processedImages.get(path);
         String imgText = imageForProcessing.getText();
+
         if (imgText.isEmpty())
             return false;
         for (int i = 0; i < textFilters.size(); i++) {
